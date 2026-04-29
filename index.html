@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Baza promotorów</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    select, button {
+      padding: 8px;
+      margin-right: 10px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f5f5f5;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Baza potencjalnych promotorów</h2>
+
+<label><strong>Wybierz dyscyplinę:</strong></label><br><br>
+
+<select id="discipline">
+  <option value="">-- wszystkie --</option>
+  <option value="językoznawstwo">Językoznawstwo</option>
+  <option value="literaturoznawstwo">Literaturoznawstwo</option>
+</select>
+
+<button onclick="filterData()">Filtruj</button>
+
+<div id="results"></div>
+
+<script>
+const data = [
+  {
+    name: "Jan Kowalski",
+    discipline: "językoznawstwo",
+    faculty: "Wydział Filologii Polskiej",
+    email: "jan@example.com"
+  },
+  {
+    name: "Anna Nowak",
+    discipline: "literaturoznawstwo",
+    faculty: "Wydział Anglistyki",
+    email: "anna@example.com"
+  },
+  {
+    name: "Piotr Wiśniewski",
+    discipline: "językoznawstwo",
+    faculty: "Wydział Lingwistyki",
+    email: "piotr@example.com"
+  }
+];
+
+function filterData() {
+  const selected = document.getElementById("discipline").value;
+
+  const filtered = selected
+    ? data.filter(p => p.discipline === selected)
+    : data;
+
+  renderResults(filtered);
+}
+
+function renderResults(list) {
+  if (list.length === 0) {
+    document.getElementById("results").innerHTML = "<p>Brak wyników</p>";
+    return;
+  }
+
+  let html = `
+    <table>
+      <tr>
+        <th>Imię i nazwisko</th>
+        <th>Dyscyplina</th>
+        <th>Wydział</th>
+        <th>Email</th>
+      </tr>
+  `;
+
+  list.forEach(p => {
+    html += `
+      <tr>
+        <td>${p.name}</td>
+        <td>${p.discipline}</td>
+        <td>${p.faculty}</td>
+        <td>${p.email}</td>
+      </tr>
+    `;
+  });
+
+  html += "</table>";
+
+  document.getElementById("results").innerHTML = html;
+}
+
+// start
+renderResults(data);
+</script>
+
+</body>
+</html>
