@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Baza promotorów</title>
+
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
 <style>
 :root{
   --uam-blue:#003b78;
@@ -13,50 +16,15 @@
   --muted:#5d6b7a;
 }
 *{box-sizing:border-box}
-body{
-  margin:0;
-  font-family: Arial, Helvetica, sans-serif;
-  color:var(--text);
-  background:#fff;
-}
-.topbar{
-  background:var(--uam-blue);
-  height:72px;
-}
-.wrapper{
-  max-width:1100px;
-  margin:0 auto;
-  padding:0 24px;
-}
-.breadcrumbs{
-  font-size:12px;
-  color:#6a6a6a;
-  padding:18px 0;
-}
-h1{
-  font-family: Georgia, "Times New Roman", serif;
-  font-size:42px;
-  text-align:center;
-  margin:28px 0 34px;
-  color:#111;
-}
-.hero{
-  background:linear-gradient(90deg,#eef4ff 0%,#f6e0d7 100%);
-  padding:36px 0;
-  margin-bottom:42px;
-}
-.hero p{
-  max-width:700px;
-  font-weight:bold;
-  line-height:1.5;
-}
-.lang{
-  display:flex;
-  justify-content:flex-end;
-  gap:8px;
-  margin-bottom:20px;
-}
-.lang button{
+body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--text);background:#fff}
+.topbar{background:var(--uam-blue);height:72px}
+.wrapper{max-width:1100px;margin:0 auto;padding:0 24px}
+.breadcrumbs{font-size:12px;color:#6a6a6a;padding:18px 0}
+h1{font-family:Georgia,"Times New Roman",serif;font-size:42px;text-align:center;margin:28px 0 34px;color:#111}
+.hero{background:linear-gradient(90deg,#eef4ff 0%,#f6e0d7 100%);padding:36px 0;margin-bottom:42px}
+.hero p{max-width:760px;font-weight:bold;line-height:1.5}
+.lang{display:flex;justify-content:flex-end;gap:8px;margin-bottom:20px}
+.lang button,.more-btn{
   border:1px solid var(--uam-blue);
   background:white;
   color:var(--uam-blue);
@@ -64,90 +32,32 @@ h1{
   cursor:pointer;
   font-weight:bold;
 }
-.lang button.active{
-  background:var(--uam-blue);
-  color:white;
-}
-.search-panel{
-  border-top:6px solid var(--uam-border);
-  background:var(--uam-light);
-  padding:28px;
-  margin-bottom:32px;
-}
-.search-panel h2{
-  margin:0 0 18px;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size:28px;
-}
-.filters{
-  display:grid;
-  grid-template-columns:2fr 1fr 1fr;
-  gap:16px;
-}
-label{
-  display:block;
-  font-weight:bold;
-  margin-bottom:7px;
-}
-input,select{
-  width:100%;
-  padding:12px;
-  border:1px solid #b5c3d4;
-  font-size:15px;
-  background:white;
-}
-.count{
-  margin:18px 0;
-  font-weight:bold;
-}
-.card{
-  border-top:5px solid var(--uam-border);
-  background:var(--uam-light);
-  padding:22px;
-  margin-bottom:18px;
-}
-.card h3{
-  margin:0 0 10px;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size:24px;
-}
-.meta{
-  color:var(--muted);
-  line-height:1.6;
-  margin-bottom:14px;
-}
-.tag{
-  display:inline-block;
-  border:1px solid #b5c3d4;
-  background:white;
-  padding:5px 10px;
-  margin:4px 5px 4px 0;
-  font-size:14px;
-}
-.links{
-  margin-top:16px;
-}
-.links a{
-  color:var(--uam-blue);
-  font-weight:bold;
-  text-decoration:none;
-  margin-right:18px;
-}
+.lang button.active,.more-btn:hover{background:var(--uam-blue);color:white}
+.search-panel{border-top:6px solid var(--uam-border);background:var(--uam-light);padding:28px;margin-bottom:32px}
+.search-panel h2{margin:0 0 18px;font-family:Georgia,"Times New Roman",serif;font-size:28px}
+.filters{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:16px}
+label{display:block;font-weight:bold;margin-bottom:7px}
+input,select{width:100%;padding:12px;border:1px solid #b5c3d4;font-size:15px;background:white}
+.count{margin:18px 0;font-weight:bold}
+.notice{background:#fff8d8;border:1px solid #e2c75b;padding:14px;margin:14px 0}
+.card{border-top:5px solid var(--uam-border);background:var(--uam-light);padding:22px;margin-bottom:18px}
+.card h3{margin:0 0 10px;font-family:Georgia,"Times New Roman",serif;font-size:24px}
+.meta{color:var(--muted);line-height:1.6;margin-bottom:14px}
+.tag{display:inline-block;border:1px solid #b5c3d4;background:white;padding:5px 10px;margin:4px 5px 4px 0;font-size:14px}
+.links{margin-top:16px}
+.links a{color:var(--uam-blue);font-weight:bold;text-decoration:none;margin-right:18px}
 .links a:hover{text-decoration:underline}
-.footer-links{
-  margin:56px 0 30px;
-}
-.footer-links h2{
-  font-family: Georgia, "Times New Roman", serif;
-  font-size:34px;
-}
-@media(max-width:800px){
+.center{text-align:center;margin:24px 0}
+.footer-links{margin:56px 0 30px}
+.footer-links h2{font-family:Georgia,"Times New Roman",serif;font-size:34px}
+@media(max-width:900px){
   h1{font-size:32px}
   .filters{grid-template-columns:1fr}
   .topbar{height:54px}
 }
 </style>
 </head>
+
 <body>
 <div class="topbar"></div>
 
@@ -170,32 +80,39 @@ input,select{
 
   <section class="search-panel">
     <h2 id="panelTitle">Wyszukiwarka</h2>
+
     <div class="filters">
       <div>
         <label id="searchLabel">Szukaj</label>
         <input id="search" placeholder="np. fonetyka, arabski, Szekspir">
       </div>
+
       <div>
         <label id="discLabel">Dyscyplina</label>
-        <select id="discipline">
-          <option value="">Wszystkie</option>
-          <option>Językoznawstwo</option>
-          <option>Literaturoznawstwo</option>
-        </select>
+        <select id="discipline"></select>
       </div>
+
       <div>
         <label id="unitLabel">Jednostka</label>
-        <select id="unit">
+        <select id="unit"></select>
+      </div>
+
+      <div>
+        <label id="profileLabel">Sylwetka</label>
+        <select id="profileFilter">
           <option value="">Wszystkie</option>
-          <option>Wydział Anglistyki</option>
-          <option>Instytut Filologii Stosowanej</option>
+          <option value="hasProfile">Tylko z sylwetką</option>
+          <option value="pl">Sylwetka PL</option>
+          <option value="en">Sylwetka EN</option>
         </select>
       </div>
     </div>
   </section>
 
+  <div id="loading" class="notice">Ładowanie danych z arkusza...</div>
   <div id="count" class="count"></div>
   <div id="results"></div>
+  <div id="moreBox" class="center"></div>
 
   <section class="footer-links">
     <h2 id="also">Zobacz także:</h2>
@@ -203,113 +120,283 @@ input,select{
 </main>
 
 <script>
-let lang="pl";
+/*
+  WAŻNE:
+  Arkusz Google musi być dostępny publicznie:
+  Plik -> Udostępnij -> Opublikuj w internecie -> arkusz WFPiK -> CSV
+*/
 
-const txt={
-  pl:{
-    title:"Baza potencjalnych promotorów",
-    subtitle:"Wyszukaj promotora po nazwisku, dyscyplinie, jednostce lub obszarze badawczym.",
-    panel:"Wyszukiwarka",
-    search:"Szukaj",
-    disc:"Dyscyplina",
-    unit:"Jednostka",
-    count:"Liczba wyników",
-    profilePL:"Sylwetka PL",
-    profileEN:"Sylwetka EN",
-    also:"Zobacz także:"
+const SHEET_URL =
+  "https://docs.google.com/spreadsheets/d/1oVB9E0bPJmFyJ1YXhzJH6wyNPV9j6vUhJ6CIjIFxSKE/gviz/tq?tqx=out:csv&sheet=WFPiK";
+
+let lang = "pl";
+let data = [];
+let visibleLimit = 20;
+let currentFilteredList = [];
+
+const txt = {
+  pl: {
+    title: "Baza potencjalnych promotorów",
+    subtitle: "Wyszukaj promotora po nazwisku, dyscyplinie, jednostce lub obszarze badawczym.",
+    panel: "Wyszukiwarka",
+    search: "Szukaj",
+    disc: "Dyscyplina",
+    unit: "Jednostka",
+    profile: "Sylwetka",
+    all: "Wszystkie",
+    onlyProfiles: "Tylko z sylwetką",
+    profilePLFilter: "Sylwetka PL",
+    profileENFilter: "Sylwetka EN",
+    count: "Liczba wyników",
+    shown: "pokazano",
+    more: "Pokaż więcej",
+    profilePL: "Sylwetka PL",
+    profileEN: "Sylwetka EN",
+    noResults: "Brak wyników dla podanych kryteriów.",
+    loading: "Ładowanie danych z arkusza...",
+    error: "Nie udało się pobrać danych. Sprawdź, czy arkusz jest opublikowany jako CSV.",
+    also: "Zobacz także:"
   },
-  en:{
-    title:"Potential supervisors database",
-    subtitle:"Search for a supervisor by name, discipline, unit or research area.",
-    panel:"Search",
-    search:"Search",
-    disc:"Discipline",
-    unit:"Unit",
-    count:"Results",
-    profilePL:"Profile PL",
-    profileEN:"Profile EN",
-    also:"See also:"
+  en: {
+    title: "Potential supervisors database",
+    subtitle: "Search for a supervisor by name, discipline, unit or research area.",
+    panel: "Search",
+    search: "Search",
+    disc: "Discipline",
+    unit: "Unit",
+    profile: "Profile",
+    all: "All",
+    onlyProfiles: "Only with profile",
+    profilePLFilter: "Profile PL",
+    profileENFilter: "Profile EN",
+    count: "Results",
+    shown: "shown",
+    more: "Show more",
+    profilePL: "Profile PL",
+    profileEN: "Profile EN",
+    noResults: "No results for the selected criteria.",
+    loading: "Loading data from the sheet...",
+    error: "Could not load data. Check whether the sheet is published as CSV.",
+    also: "See also:"
   }
 };
 
-const data=[
-  {
-    name:"Paulina Ambroży",
-    discipline:"Literaturoznawstwo",
-    unit:"Wydział Anglistyki",
-    email:"apaulina@amu.edu.pl",
-    keywords:["ekokrytyka","nature writing","poezja amerykańska","badania intermedialne"],
-    pl:"#",
-    en:""
-  },
-  {
-    name:"Katarzyna Dziubalska-Kołaczyk",
-    discipline:"Językoznawstwo",
-    unit:"Wydział Anglistyki",
-    email:"dkasia@amu.edu.pl",
-    keywords:["fonologia","fonetyka","akwizycja języka","przetwarzanie mowy"],
-    pl:"#",
-    en:"#"
-  },
-  {
-    name:"Marcin Michalski",
-    discipline:"Językoznawstwo",
-    unit:"Instytut Filologii Stosowanej",
-    email:"marcin.michalski@amu.edu.pl",
-    keywords:["język arabski","morfologia języka arabskiego","dialekty arabskie"],
-    pl:"",
-    en:"#"
-  }
-];
+function setLang(l) {
+  lang = l;
 
-function setLang(l){
-  lang=l;
-  document.getElementById("plBtn").classList.toggle("active",l==="pl");
-  document.getElementById("enBtn").classList.toggle("active",l==="en");
-  document.getElementById("title").innerText=txt[l].title;
-  document.getElementById("subtitle").innerText=txt[l].subtitle;
-  document.getElementById("panelTitle").innerText=txt[l].panel;
-  document.getElementById("searchLabel").innerText=txt[l].search;
-  document.getElementById("discLabel").innerText=txt[l].disc;
-  document.getElementById("unitLabel").innerText=txt[l].unit;
-  document.getElementById("also").innerText=txt[l].also;
+  document.getElementById("plBtn").classList.toggle("active", l === "pl");
+  document.getElementById("enBtn").classList.toggle("active", l === "en");
+
+  document.getElementById("title").innerText = txt[l].title;
+  document.getElementById("subtitle").innerText = txt[l].subtitle;
+  document.getElementById("panelTitle").innerText = txt[l].panel;
+  document.getElementById("searchLabel").innerText = txt[l].search;
+  document.getElementById("discLabel").innerText = txt[l].disc;
+  document.getElementById("unitLabel").innerText = txt[l].unit;
+  document.getElementById("profileLabel").innerText = txt[l].profile;
+  document.getElementById("also").innerText = txt[l].also;
+
+  const profileFilter = document.getElementById("profileFilter");
+  profileFilter.options[0].text = txt[l].all;
+  profileFilter.options[1].text = txt[l].onlyProfiles;
+  profileFilter.options[2].text = txt[l].profilePLFilter;
+  profileFilter.options[3].text = txt[l].profileENFilter;
+
+  fillFilters();
   render();
 }
 
-function normalize(x){
-  return String(x||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+function normalize(value) {
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\\u0300-\\u036f]/g, "");
 }
 
-function render(){
-  const q=normalize(document.getElementById("search").value);
-  const d=document.getElementById("discipline").value;
-  const u=document.getElementById("unit").value;
+function getCell(row, names) {
+  for (const name of names) {
+    if (row[name] !== undefined) return String(row[name] || "").trim();
+  }
+  return "";
+}
 
-  const list=data.filter(p=>{
-    const hay=normalize([p.name,p.discipline,p.unit,p.email,...p.keywords].join(" "));
-    return (!q||hay.includes(q)) && (!d||p.discipline===d) && (!u||p.unit===u);
+function splitValues(value) {
+  return String(value || "")
+    .split(";")
+    .map(x => x.trim())
+    .filter(Boolean);
+}
+
+async function loadData() {
+  try {
+    document.getElementById("loading").innerText = txt[lang].loading;
+
+    const response = await fetch(SHEET_URL);
+    const csv = await response.text();
+
+    const parsed = Papa.parse(csv, {
+      header: true,
+      skipEmptyLines: true
+    });
+
+    data = parsed.data
+      .map(row => {
+        const active = getCell(row, ["Aktywny", "active"]);
+        const researchPL = getCell(row, ["Obszary badawcze", "research_areas", "research_areas_PL"]);
+        const researchEN = getCell(row, ["Obszary badawcze EN", "research_areas_EN", "Research areas EN"]);
+
+        return {
+          name: getCell(row, ["Nazwisko/ Imię", "Nazwisko/Imię", "name", "Name"]),
+          discipline: getCell(row, ["Dyscyplina", "discipline", "Discipline"]),
+          unit: getCell(row, ["Jednostka", "unit", "Unit"]),
+          email: getCell(row, ["Adres e-mail", "Email", "email"]),
+          researchPL,
+          researchEN,
+          keywordsPL: splitValues(researchPL),
+          keywordsEN: splitValues(researchEN),
+          profilePL: getCell(row, ["sylwetka_PL", "profile_pl", "profilePL"]),
+          profileEN: getCell(row, ["sylwetka_EN", "profile_en", "profileEN"]),
+          active
+        };
+      })
+      .filter(p => p.name && normalize(p.active) !== "nie" && normalize(p.active) !== "no");
+
+    document.getElementById("loading").style.display = "none";
+    fillFilters();
+    render();
+
+  } catch (error) {
+    document.getElementById("loading").innerText = txt[lang].error;
+    console.error(error);
+  }
+}
+
+function fillFilters() {
+  const disciplineSelect = document.getElementById("discipline");
+  const unitSelect = document.getElementById("unit");
+
+  const currentDiscipline = disciplineSelect.value;
+  const currentUnit = unitSelect.value;
+
+  disciplineSelect.innerHTML = `<option value="">${txt[lang].all}</option>`;
+  unitSelect.innerHTML = `<option value="">${txt[lang].all}</option>`;
+
+  [...new Set(data.map(p => p.discipline).filter(Boolean))]
+    .sort((a,b) => a.localeCompare(b, "pl"))
+    .forEach(value => {
+      disciplineSelect.innerHTML += `<option value="${value}">${value}</option>`;
+    });
+
+  [...new Set(data.map(p => p.unit).filter(Boolean))]
+    .sort((a,b) => a.localeCompare(b, "pl"))
+    .forEach(value => {
+      unitSelect.innerHTML += `<option value="${value}">${value}</option>`;
+    });
+
+  disciplineSelect.value = currentDiscipline;
+  unitSelect.value = currentUnit;
+}
+
+function render() {
+  const query = normalize(document.getElementById("search").value);
+  const discipline = document.getElementById("discipline").value;
+  const unit = document.getElementById("unit").value;
+  const profileFilter = document.getElementById("profileFilter").value;
+
+  currentFilteredList = data.filter(p => {
+    const haystack = normalize([
+      p.name,
+      p.discipline,
+      p.unit,
+      p.email,
+      p.researchPL,
+      p.researchEN
+    ].join(" "));
+
+    const matchesQuery = !query || haystack.includes(query);
+    const matchesDiscipline = !discipline || p.discipline === discipline;
+    const matchesUnit = !unit || p.unit === unit;
+
+    const hasPL = Boolean(p.profilePL);
+    const hasEN = Boolean(p.profileEN);
+
+    let matchesProfile = true;
+    if (profileFilter === "hasProfile") matchesProfile = hasPL || hasEN;
+    if (profileFilter === "pl") matchesProfile = hasPL;
+    if (profileFilter === "en") matchesProfile = hasEN;
+
+    return matchesQuery && matchesDiscipline && matchesUnit && matchesProfile;
   });
 
-  document.getElementById("count").innerText=txt[lang].count+": "+list.length;
+  const limitedList = currentFilteredList.slice(0, visibleLimit);
 
-  document.getElementById("results").innerHTML=list.map(p=>`
-    <article class="card">
-      <h3>${p.name}</h3>
-      <div class="meta"><strong>${p.discipline}</strong><br>${p.unit}</div>
-      <div>${p.keywords.map(k=>`<span class="tag">${k}</span>`).join("")}</div>
-      <div class="links">
-        <a href="mailto:${p.email}">${p.email}</a>
-        ${p.pl?`<a href="${p.pl}" target="_blank">${txt[lang].profilePL}</a>`:""}
-        ${p.en?`<a href="${p.en}" target="_blank">${txt[lang].profileEN}</a>`:""}
-      </div>
-    </article>
-  `).join("");
+  document.getElementById("count").innerText =
+    `${txt[lang].count}: ${currentFilteredList.length}` +
+    (currentFilteredList.length > visibleLimit ? ` — ${txt[lang].shown}: ${visibleLimit}` : "");
+
+  if (!limitedList.length) {
+    document.getElementById("results").innerHTML = `<div class="notice">${txt[lang].noResults}</div>`;
+    document.getElementById("moreBox").innerHTML = "";
+    return;
+  }
+
+  document.getElementById("results").innerHTML = limitedList.map(p => {
+    const keywords = lang === "en" && p.keywordsEN.length ? p.keywordsEN : p.keywordsPL;
+
+    return `
+      <article class="card">
+        <h3>${p.name}</h3>
+
+        <div class="meta">
+          <strong>${p.discipline}</strong><br>
+          ${p.unit}
+        </div>
+
+        <div>
+          ${keywords.map(k => `<span class="tag">${k}</span>`).join("")}
+        </div>
+
+        <div class="links">
+          ${p.email ? `<a href="mailto:${p.email}">${p.email}</a>` : ""}
+          ${p.profilePL ? `<a href="${p.profilePL}" target="_blank" rel="noopener">${txt[lang].profilePL}</a>` : ""}
+          ${p.profileEN ? `<a href="${p.profileEN}" target="_blank" rel="noopener">${txt[lang].profileEN}</a>` : ""}
+        </div>
+      </article>
+    `;
+  }).join("");
+
+  document.getElementById("moreBox").innerHTML =
+    currentFilteredList.length > visibleLimit
+      ? `<button class="more-btn" onclick="showMore()">${txt[lang].more}</button>`
+      : "";
 }
 
-document.getElementById("search").oninput=render;
-document.getElementById("discipline").onchange=render;
-document.getElementById("unit").onchange=render;
-render();
+function showMore() {
+  visibleLimit += 20;
+  render();
+}
+
+document.getElementById("search").addEventListener("input", () => {
+  visibleLimit = 20;
+  render();
+});
+
+document.getElementById("discipline").addEventListener("change", () => {
+  visibleLimit = 20;
+  render();
+});
+
+document.getElementById("unit").addEventListener("change", () => {
+  visibleLimit = 20;
+  render();
+});
+
+document.getElementById("profileFilter").addEventListener("change", () => {
+  visibleLimit = 20;
+  render();
+});
+
+loadData();
 </script>
 </body>
 </html>
