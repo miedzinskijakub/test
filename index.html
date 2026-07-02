@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Baza promotorów</title>
+<title>Wyszukiwarka promotorów</title>
 
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
@@ -16,12 +16,48 @@
   --muted:#5d6b7a;
 }
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--text);background:#fff}
-.supervisor-search{max-width:1100px;margin:0 auto;padding:16px 0}
-.search-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px}
-.search-header h2{margin:0 0 8px;font-family:Georgia,"Times New Roman",serif;font-size:30px;color:#111}
-.search-header p{margin:0;color:var(--muted);line-height:1.5;max-width:760px}
-.lang{display:flex;justify-content:flex-end;gap:8px;margin-bottom:0;flex-shrink:0}
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  color:var(--text);
+  background:#fff;
+}
+.supervisor-search{
+  max-width:1100px;
+  margin:0 auto;
+  padding:20px;
+  display:block;
+  width:100%;
+}
+.search-header{
+  display:block;
+  margin-bottom:18px;
+}
+.search-title-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:16px;
+  flex-wrap:wrap;
+}
+.search-header h2{
+  margin:0 0 8px;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:30px;
+  color:#111;
+}
+.search-header p{
+  margin:0;
+  color:var(--muted);
+  line-height:1.5;
+  max-width:760px;
+}
+.lang{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  flex-shrink:0;
+}
 .lang button,.more-btn{
   border:1px solid var(--uam-blue);
   background:white;
@@ -30,24 +66,91 @@ body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--text);backgroun
   cursor:pointer;
   font-weight:bold;
 }
-.lang button.active,.more-btn:hover{background:var(--uam-blue);color:white}
-.search-panel{border-top:6px solid var(--uam-border);background:var(--uam-light);padding:28px;margin-bottom:32px}
-.search-panel h2{margin:0 0 18px;font-family:Georgia,"Times New Roman",serif;font-size:28px}
-.filters{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:16px}
-label{display:block;font-weight:bold;margin-bottom:7px}
-input,select{width:100%;padding:12px;border:1px solid #b5c3d4;font-size:15px;background:white}
-.count{margin:18px 0;font-weight:bold}
-.notice{background:#fff8d8;border:1px solid #e2c75b;padding:14px;margin:14px 0}
-.card{border-top:5px solid var(--uam-border);background:var(--uam-light);padding:22px;margin-bottom:18px}
-.card h3{margin:0 0 10px;font-family:Georgia,"Times New Roman",serif;font-size:24px}
-.meta{color:var(--muted);line-height:1.6;margin-bottom:14px}
-.tag{display:inline-block;border:1px solid #b5c3d4;background:white;padding:5px 10px;margin:4px 5px 4px 0;font-size:14px}
-.links{margin-top:16px}
-.links a{color:var(--uam-blue);font-weight:bold;text-decoration:none;margin-right:18px}
+.lang button.active,.more-btn:hover{
+  background:var(--uam-blue);
+  color:white;
+}
+.search-panel{
+  display:block;
+  width:100%;
+  border-top:6px solid var(--uam-border);
+  background:var(--uam-light);
+  padding:24px;
+  margin:20px 0 24px;
+}
+.filters{
+  display:grid;
+  grid-template-columns:minmax(240px,2fr) minmax(150px,1fr) minmax(180px,1fr) minmax(150px,1fr);
+  gap:16px;
+}
+label{
+  display:block;
+  font-weight:bold;
+  margin-bottom:7px;
+}
+input,select{
+  width:100%;
+  padding:12px;
+  border:1px solid #b5c3d4;
+  font-size:15px;
+  background:white;
+}
+.count{
+  margin:18px 0;
+  font-weight:bold;
+}
+.notice{
+  background:#fff8d8;
+  border:1px solid #e2c75b;
+  padding:14px;
+  margin:14px 0;
+}
+#results{
+  display:block;
+  width:100%;
+}
+.card{
+  display:block;
+  width:100%;
+  border-top:5px solid var(--uam-border);
+  background:var(--uam-light);
+  padding:22px;
+  margin-bottom:18px;
+}
+.card h3{
+  margin:0 0 10px;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:24px;
+}
+.meta{
+  color:var(--muted);
+  line-height:1.6;
+  margin-bottom:14px;
+}
+.tag{
+  display:inline-block;
+  border:1px solid #b5c3d4;
+  background:white;
+  padding:5px 10px;
+  margin:4px 5px 4px 0;
+  font-size:14px;
+}
+.links{
+  margin-top:16px;
+}
+.links a{
+  color:var(--uam-blue);
+  font-weight:bold;
+  text-decoration:none;
+  margin-right:18px;
+  display:inline-block;
+  margin-top:6px;
+}
 .links a:hover{text-decoration:underline}
 .center{text-align:center;margin:24px 0}
 @media(max-width:900px){
-  .search-header{flex-direction:column}
+  .search-title-row{display:block}
+  .lang{justify-content:flex-start;margin-top:14px}
   .search-header h2{font-size:26px}
   .filters{grid-template-columns:1fr}
 }
@@ -57,13 +160,17 @@ input,select{width:100%;padding:12px;border:1px solid #b5c3d4;font-size:15px;bac
 <body>
 <div class="supervisor-search">
   <div class="search-header">
-    <div>
-      <h2 id="title">Wyszukiwarka promotorów</h2>
-      <p id="subtitle">Wyszukaj promotora po nazwisku, dyscyplinie, jednostce lub obszarze badawczym.</p>
+    <div class="search-title-row">
+      <div>
+        <h2 id="title">Wyszukiwarka promotorów</h2>
+        <p id="subtitle">Wyszukaj promotora po nazwisku, dyscyplinie, jednostce lub obszarze badawczym.</p>
+      </div>
+
+      <div class="lang">
+        <button id="plBtn" class="active" onclick="setLang('pl')">Polski</button>
+        <button id="enBtn" onclick="setLang('en')">English</button>
+      </div>
     </div>
-  <div class="lang">
-    <button id="plBtn" class="active" onclick="setLang('pl')">Polski</button>
-    <button id="enBtn" onclick="setLang('en')">English</button>
   </div>
 
   <section class="search-panel">
@@ -111,9 +218,8 @@ let visibleLimit = 20;
 
 const txt = {
   pl: {
-    title: "Baza potencjalnych promotorów",
+    title: "Wyszukiwarka promotorów",
     subtitle: "Wyszukaj promotora po nazwisku, dyscyplinie, jednostce lub obszarze badawczym.",
-    panel: "Wyszukiwarka",
     search: "Szukaj",
     disc: "Dyscyplina",
     unit: "Jednostka",
@@ -129,12 +235,11 @@ const txt = {
     profileEN: "Sylwetka EN",
     noResults: "Brak wyników dla podanych kryteriów.",
     loading: "Ładowanie danych z arkusza...",
-    error: "Nie udało się pobrać danych. Sprawdź, czy arkusz jest udostępniony/opublikowany.",
+    error: "Nie udało się pobrać danych. Sprawdź, czy arkusz jest udostępniony/opublikowany."
   },
   en: {
-    title: "Potential supervisors database",
+    title: "Supervisor search",
     subtitle: "Search for a supervisor by name, discipline, unit or research area.",
-    panel: "Search",
     search: "Search",
     disc: "Discipline",
     unit: "Unit",
@@ -150,7 +255,7 @@ const txt = {
     profileEN: "Profile EN",
     noResults: "No results for the selected criteria.",
     loading: "Loading data from the sheet...",
-    error: "Could not load data. Check whether the sheet is shared/published.",
+    error: "Could not load data. Check whether the sheet is shared/published."
   }
 };
 
@@ -225,6 +330,7 @@ function currentKeywords(person) {
 
 async function loadData() {
   try {
+    document.getElementById("loading").style.display = "block";
     document.getElementById("loading").innerText = txt[lang].loading;
 
     const response = await fetch(SHEET_URL);
