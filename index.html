@@ -17,13 +17,11 @@
 }
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--text);background:#fff}
-.topbar{background:var(--uam-blue);height:72px}
-.wrapper{max-width:1100px;margin:0 auto;padding:0 24px}
-.breadcrumbs{font-size:12px;color:#6a6a6a;padding:18px 0}
-h1{font-family:Georgia,"Times New Roman",serif;font-size:42px;text-align:center;margin:28px 0 34px;color:#111}
-.hero{background:linear-gradient(90deg,#eef4ff 0%,#f6e0d7 100%);padding:36px 0;margin-bottom:42px}
-.hero p{max-width:760px;font-weight:bold;line-height:1.5}
-.lang{display:flex;justify-content:flex-end;gap:8px;margin-bottom:20px}
+.supervisor-search{max-width:1100px;margin:0 auto;padding:16px 0}
+.search-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px}
+.search-header h2{margin:0 0 8px;font-family:Georgia,"Times New Roman",serif;font-size:30px;color:#111}
+.search-header p{margin:0;color:var(--muted);line-height:1.5;max-width:760px}
+.lang{display:flex;justify-content:flex-end;gap:8px;margin-bottom:0;flex-shrink:0}
 .lang button,.more-btn{
   border:1px solid var(--uam-blue);
   background:white;
@@ -49,36 +47,26 @@ input,select{width:100%;padding:12px;border:1px solid #b5c3d4;font-size:15px;bac
 .links a:hover{text-decoration:underline}
 .center{text-align:center;margin:24px 0}
 @media(max-width:900px){
-  h1{font-size:32px}
+  .search-header{flex-direction:column}
+  .search-header h2{font-size:26px}
   .filters{grid-template-columns:1fr}
-  .topbar{height:54px}
 }
 </style>
 </head>
 
 <body>
-<div class="topbar"></div>
-
-<div class="wrapper">
-  <div class="breadcrumbs">Start &gt; Doktoranci &gt; Szkoły doktorskie &gt; Baza promotorów</div>
-  <h1 id="title">Baza potencjalnych promotorów</h1>
-</div>
-
-<section class="hero">
-  <div class="wrapper">
-    <p id="subtitle">Wyszukaj promotora po nazwisku, dyscyplinie, jednostce lub obszarze badawczym.</p>
-  </div>
-</section>
-
-<main class="wrapper">
+<div class="supervisor-search">
+  <div class="search-header">
+    <div>
+      <h2 id="title">Wyszukiwarka promotorów</h2>
+      <p id="subtitle">Wyszukaj promotora po nazwisku, dyscyplinie, jednostce lub obszarze badawczym.</p>
+    </div>
   <div class="lang">
     <button id="plBtn" class="active" onclick="setLang('pl')">Polski</button>
     <button id="enBtn" onclick="setLang('en')">English</button>
   </div>
 
   <section class="search-panel">
-    <h2 id="panelTitle">Wyszukiwarka</h2>
-
     <div class="filters">
       <div>
         <label id="searchLabel">Szukaj</label>
@@ -111,7 +99,7 @@ input,select{width:100%;padding:12px;border:1px solid #b5c3d4;font-size:15px;bac
   <div id="count" class="count"></div>
   <div id="results"></div>
   <div id="moreBox" class="center"></div>
-</main>
+</div>
 
 <script>
 const SHEET_URL =
@@ -175,7 +163,6 @@ function setLang(l) {
 
   document.getElementById("title").innerText = txt[l].title;
   document.getElementById("subtitle").innerText = txt[l].subtitle;
-  document.getElementById("panelTitle").innerText = txt[l].panel;
   document.getElementById("searchLabel").innerText = txt[l].search;
   document.getElementById("discLabel").innerText = txt[l].disc;
   document.getElementById("unitLabel").innerText = txt[l].unit;
