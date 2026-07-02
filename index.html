@@ -48,8 +48,6 @@ input,select{width:100%;padding:12px;border:1px solid #b5c3d4;font-size:15px;bac
 .links a{color:var(--uam-blue);font-weight:bold;text-decoration:none;margin-right:18px}
 .links a:hover{text-decoration:underline}
 .center{text-align:center;margin:24px 0}
-.footer-links{margin:56px 0 30px}
-.footer-links h2{font-family:Georgia,"Times New Roman",serif;font-size:34px}
 @media(max-width:900px){
   h1{font-size:32px}
   .filters{grid-template-columns:1fr}
@@ -113,26 +111,15 @@ input,select{width:100%;padding:12px;border:1px solid #b5c3d4;font-size:15px;bac
   <div id="count" class="count"></div>
   <div id="results"></div>
   <div id="moreBox" class="center"></div>
-
-  <section class="footer-links">
-    <h2 id="also">Zobacz także:</h2>
-  </section>
 </main>
 
 <script>
-/*
-  WAŻNE:
-  Arkusz Google musi być dostępny publicznie:
-  Plik -> Udostępnij -> Opublikuj w internecie -> arkusz WFPiK -> CSV
-*/
-
 const SHEET_URL =
   "https://docs.google.com/spreadsheets/d/1oVB9E0bPJmFyJ1YXhzJH6wyNPV9j6vUhJ6CIjIFxSKE/gviz/tq?tqx=out:csv&sheet=WFPiK";
 
 let lang = "pl";
 let data = [];
 let visibleLimit = 20;
-let currentFilteredList = [];
 
 const txt = {
   pl: {
@@ -154,8 +141,7 @@ const txt = {
     profileEN: "Sylwetka EN",
     noResults: "Brak wyników dla podanych kryteriów.",
     loading: "Ładowanie danych z arkusza...",
-    error: "Nie udało się pobrać danych. Sprawdź, czy arkusz jest opublikowany jako CSV.",
-    also: "Zobacz także:"
+    error: "Nie udało się pobrać danych. Sprawdź, czy arkusz jest udostępniony/opublikowany.",
   },
   en: {
     title: "Potential supervisors database",
@@ -176,13 +162,13 @@ const txt = {
     profileEN: "Profile EN",
     noResults: "No results for the selected criteria.",
     loading: "Loading data from the sheet...",
-    error: "Could not load data. Check whether the sheet is published as CSV.",
-    also: "See also:"
+    error: "Could not load data. Check whether the sheet is shared/published.",
   }
 };
 
 function setLang(l) {
   lang = l;
+  visibleLimit = 20;
 
   document.getElementById("plBtn").classList.toggle("active", l === "pl");
   document.getElementById("enBtn").classList.toggle("active", l === "en");
@@ -194,7 +180,6 @@ function setLang(l) {
   document.getElementById("discLabel").innerText = txt[l].disc;
   document.getElementById("unitLabel").innerText = txt[l].unit;
   document.getElementById("profileLabel").innerText = txt[l].profile;
-  document.getElementById("also").innerText = txt[l].also;
 
   const profileFilter = document.getElementById("profileFilter");
   profileFilter.options[0].text = txt[l].all;
@@ -213,18 +198,42 @@ function normalize(value) {
     .replace(/[\\u0300-\\u036f]/g, "");
 }
 
+function cleanValue(value) {
+  const v = String(value || "").trim();
+  if (v === "#VALUE!" || v === "#N/A" || v === "undefined" || v === "null") return "";
+  return v;
+}
+
 function getCell(row, names) {
   for (const name of names) {
-    if (row[name] !== undefined) return String(row[name] || "").trim();
+    if (row[name] !== undefined) return cleanValue(row[name]);
   }
   return "";
 }
 
 function splitValues(value) {
-  return String(value || "")
+  return cleanValue(value)
     .split(";")
     .map(x => x.trim())
     .filter(Boolean);
+}
+
+function currentDiscipline(person) {
+  return lang === "en" && person.disciplineEN
+    ? person.disciplineEN
+    : person.disciplinePL;
+}
+
+function currentUnit(person) {
+  return lang === "en" && person.unitEN
+    ? person.unitEN
+    : person.unitPL;
+}
+
+function currentKeywords(person) {
+  return lang === "en" && person.keywordsEN.length
+    ? person.keywordsEN
+    : person.keywordsPL;
 }
 
 async function loadData() {
@@ -241,25 +250,30 @@ async function loadData() {
 
     data = parsed.data
       .map(row => {
+        const researchPL = getCell(row, ["research_PL"]);
+        const researchEN = getCell(row, ["research_EN"]);
         const active = getCell(row, ["Aktywny", "active"]);
-        const researchPL = getCell(row, ["Obszary badawcze", "research_areas", "research_areas_PL"]);
-        const researchEN = getCell(row, ["Obszary badawcze EN", "research_areas_EN", "Research areas EN"]);
 
         return {
-          name: getCell(row, ["Nazwisko/ Imię", "Nazwisko/Imię", "name", "Name"]),
-          discipline: getCell(row, ["Dyscyplina", "discipline", "Discipline"]),
-          unit: getCell(row, ["Jednostka", "unit", "Unit"]),
-          email: getCell(row, ["Adres e-mail", "Email", "email"]),
+          name: getCell(row, ["name", "Nazwisko/ Imię", "Nazwisko/Imię"]),
+          disciplinePL: getCell(row, ["discipline_PL"]),
+          disciplineEN: getCell(row, ["discipline_EN"]),
+          unitPL: getCell(row, ["unit_PL"]),
+          unitEN: getCell(row, ["unit_EN"]),
           researchPL,
           researchEN,
           keywordsPL: splitValues(researchPL),
           keywordsEN: splitValues(researchEN),
-          profilePL: getCell(row, ["sylwetka_PL", "profile_pl", "profilePL"]),
-          profileEN: getCell(row, ["sylwetka_EN", "profile_en", "profileEN"]),
-          active
+          email: getCell(row, ["Adres e-mail", "email", "Email"]),
+          active,
+          profilePL: getCell(row, ["sylwetka_PL", "profile_PL", "profile_pl"]),
+          profileEN: getCell(row, ["sylwetka_EN", "profile_EN", "profile_en"])
         };
       })
-      .filter(p => p.name && normalize(p.active) !== "nie" && normalize(p.active) !== "no");
+      .filter(p => {
+        const active = normalize(p.active);
+        return p.name && active !== "nie" && active !== "no" && active !== "false";
+      });
 
     document.getElementById("loading").style.display = "none";
     fillFilters();
@@ -275,47 +289,53 @@ function fillFilters() {
   const disciplineSelect = document.getElementById("discipline");
   const unitSelect = document.getElementById("unit");
 
-  const currentDiscipline = disciplineSelect.value;
-  const currentUnit = unitSelect.value;
+  const currentD = disciplineSelect.value;
+  const currentU = unitSelect.value;
 
   disciplineSelect.innerHTML = `<option value="">${txt[lang].all}</option>`;
   unitSelect.innerHTML = `<option value="">${txt[lang].all}</option>`;
 
-  [...new Set(data.map(p => p.discipline).filter(Boolean))]
-    .sort((a,b) => a.localeCompare(b, "pl"))
+  [...new Set(data.map(p => currentDiscipline(p)).filter(Boolean))]
+    .sort((a,b) => a.localeCompare(b, lang === "pl" ? "pl" : "en"))
     .forEach(value => {
       disciplineSelect.innerHTML += `<option value="${value}">${value}</option>`;
     });
 
-  [...new Set(data.map(p => p.unit).filter(Boolean))]
-    .sort((a,b) => a.localeCompare(b, "pl"))
+  [...new Set(data.map(p => currentUnit(p)).filter(Boolean))]
+    .sort((a,b) => a.localeCompare(b, lang === "pl" ? "pl" : "en"))
     .forEach(value => {
       unitSelect.innerHTML += `<option value="${value}">${value}</option>`;
     });
 
-  disciplineSelect.value = currentDiscipline;
-  unitSelect.value = currentUnit;
+  if ([...disciplineSelect.options].some(o => o.value === currentD)) {
+    disciplineSelect.value = currentD;
+  }
+
+  if ([...unitSelect.options].some(o => o.value === currentU)) {
+    unitSelect.value = currentU;
+  }
 }
 
 function render() {
   const query = normalize(document.getElementById("search").value);
-  const discipline = document.getElementById("discipline").value;
-  const unit = document.getElementById("unit").value;
+  const selectedDiscipline = document.getElementById("discipline").value;
+  const selectedUnit = document.getElementById("unit").value;
   const profileFilter = document.getElementById("profileFilter").value;
 
-  currentFilteredList = data.filter(p => {
+  const filtered = data.filter(p => {
+    const discipline = currentDiscipline(p);
+    const unit = currentUnit(p);
+
     const haystack = normalize([
       p.name,
-      p.discipline,
-      p.unit,
       p.email,
+      p.disciplinePL,
+      p.disciplineEN,
+      p.unitPL,
+      p.unitEN,
       p.researchPL,
       p.researchEN
     ].join(" "));
-
-    const matchesQuery = !query || haystack.includes(query);
-    const matchesDiscipline = !discipline || p.discipline === discipline;
-    const matchesUnit = !unit || p.unit === unit;
 
     const hasPL = Boolean(p.profilePL);
     const hasEN = Boolean(p.profileEN);
@@ -325,48 +345,50 @@ function render() {
     if (profileFilter === "pl") matchesProfile = hasPL;
     if (profileFilter === "en") matchesProfile = hasEN;
 
-    return matchesQuery && matchesDiscipline && matchesUnit && matchesProfile;
+    return (
+      (!query || haystack.includes(query)) &&
+      (!selectedDiscipline || discipline === selectedDiscipline) &&
+      (!selectedUnit || unit === selectedUnit) &&
+      matchesProfile
+    );
   });
 
-  const limitedList = currentFilteredList.slice(0, visibleLimit);
+  const limited = filtered.slice(0, visibleLimit);
 
   document.getElementById("count").innerText =
-    `${txt[lang].count}: ${currentFilteredList.length}` +
-    (currentFilteredList.length > visibleLimit ? ` — ${txt[lang].shown}: ${visibleLimit}` : "");
+    `${txt[lang].count}: ${filtered.length}` +
+    (filtered.length > visibleLimit ? ` — ${txt[lang].shown}: ${visibleLimit}` : "");
 
-  if (!limitedList.length) {
-    document.getElementById("results").innerHTML = `<div class="notice">${txt[lang].noResults}</div>`;
+  if (!limited.length) {
+    document.getElementById("results").innerHTML =
+      `<div class="notice">${txt[lang].noResults}</div>`;
     document.getElementById("moreBox").innerHTML = "";
     return;
   }
 
-  document.getElementById("results").innerHTML = limitedList.map(p => {
-    const keywords = lang === "en" && p.keywordsEN.length ? p.keywordsEN : p.keywordsPL;
+  document.getElementById("results").innerHTML = limited.map(p => `
+    <article class="card">
+      <h3>${p.name}</h3>
 
-    return `
-      <article class="card">
-        <h3>${p.name}</h3>
+      <div class="meta">
+        <strong>${currentDiscipline(p)}</strong><br>
+        ${currentUnit(p)}
+      </div>
 
-        <div class="meta">
-          <strong>${p.discipline}</strong><br>
-          ${p.unit}
-        </div>
+      <div>
+        ${currentKeywords(p).map(k => `<span class="tag">${k}</span>`).join("")}
+      </div>
 
-        <div>
-          ${keywords.map(k => `<span class="tag">${k}</span>`).join("")}
-        </div>
-
-        <div class="links">
-          ${p.email ? `<a href="mailto:${p.email}">${p.email}</a>` : ""}
-          ${p.profilePL ? `<a href="${p.profilePL}" target="_blank" rel="noopener">${txt[lang].profilePL}</a>` : ""}
-          ${p.profileEN ? `<a href="${p.profileEN}" target="_blank" rel="noopener">${txt[lang].profileEN}</a>` : ""}
-        </div>
-      </article>
-    `;
-  }).join("");
+      <div class="links">
+        ${p.email ? `<a href="mailto:${p.email}">${p.email}</a>` : ""}
+        ${p.profilePL ? `<a href="${p.profilePL}" target="_blank" rel="noopener">${txt[lang].profilePL}</a>` : ""}
+        ${p.profileEN ? `<a href="${p.profileEN}" target="_blank" rel="noopener">${txt[lang].profileEN}</a>` : ""}
+      </div>
+    </article>
+  `).join("");
 
   document.getElementById("moreBox").innerHTML =
-    currentFilteredList.length > visibleLimit
+    filtered.length > visibleLimit
       ? `<button class="more-btn" onclick="showMore()">${txt[lang].more}</button>`
       : "";
 }
