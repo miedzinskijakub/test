@@ -1,8 +1,315 @@
-<!DOCTYPE html><html lang="pl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Prototype</title><style>body{font-family:Arial;margin:20px;max-width:1000px;margin:auto} .top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}.lang button{padding:8px 12px;margin-left:4px}.active{background:#222;color:#fff}.filters{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;margin:20px 0}input,select{padding:8px}.card{border:1px solid #ccc;border-radius:8px;padding:12px;margin:10px 0}.tag{display:inline-block;background:#eee;padding:3px 8px;border-radius:20px;margin:2px;font-size:12px}@media(max-width:700px){.filters{grid-template-columns:1fr}}</style></head><body><div class="top"><div><h1 id=tit>Baza potencjalnych promotorów</h1><p id=sub>Wyszukaj promotora.</p></div><div class=lang><button id=pl class=active onclick="langSet('pl')">🇵🇱 Polski</button><button id=en onclick="langSet('en')">🇬🇧 English</button></div></div><div class=filters><input id=q placeholder="Szukaj..."><select id=d><option value="">Wszystkie dyscypliny</option><option>Językoznawstwo</option><option>Literaturoznawstwo</option></select><select id=u><option value="">Wszystkie jednostki</option><option>Wydział Anglistyki</option><option>Instytut Filologii Stosowanej</option></select></div><div id=cnt></div><div id=res></div><script>
-let L="pl";
-const txt={pl:{t:"Baza potencjalnych promotorów",s:"Wyszukaj promotora.",c:"Liczba wyników",pl:"Sylwetka PL",en:"Sylwetka EN"},en:{t:"Potential supervisors",s:"Search supervisors.",c:"Results",pl:"Profile PL",en:"Profile EN"}};
-const data=[{n:"Paulina Ambroży",d:"Literaturoznawstwo",u:"Wydział Anglistyki",e:"apaulina@amu.edu.pl",k:["ekokrytyka","nature writing"],pl:"#",en:""},{n:"Katarzyna Dziubalska-Kołaczyk",d:"Językoznawstwo",u:"Wydział Anglistyki",e:"dkasia@amu.edu.pl",k:["fonologia","fonetyka"],pl:"#",en:"#"}];
-function langSet(x){L=x;pl.className=x=="pl"?"active":"";en.className=x=="en"?"active":"";tit.innerText=txt[x].t;sub.innerText=txt[x].s;draw();}
-function draw(){let r=data.filter(p=>(!q.value||JSON.stringify(p).toLowerCase().includes(q.value.toLowerCase()))&&(!d.value||p.d==d.value)&&(!u.value||p.u==u.value));cnt.innerText=txt[L].c+": "+r.length;res.innerHTML=r.map(p=>`<div class=card><h3>${p.n}</h3><b>${p.d}</b><br>${p.u}<p>${p.k.map(x=>`<span class=tag>${x}</span>`).join("")}</p><a href="mailto:${p.e}">${p.e}</a> ${p.pl?`| <a href="${p.pl}" target=_blank>${txt[L].pl}</a>`:""} ${p.en?`| <a href="${p.en}" target=_blank>${txt[L].en}</a>`:""}</div>`).join("");}
-q.oninput=draw;d.onchange=draw;u.onchange=draw;draw();
-</script></body></html>
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baza promotorów</title>
+<style>
+:root{
+  --uam-blue:#003b78;
+  --uam-light:#eaf1fb;
+  --uam-border:#006eb6;
+  --text:#10233f;
+  --muted:#5d6b7a;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: Arial, Helvetica, sans-serif;
+  color:var(--text);
+  background:#fff;
+}
+.topbar{
+  background:var(--uam-blue);
+  height:72px;
+}
+.wrapper{
+  max-width:1100px;
+  margin:0 auto;
+  padding:0 24px;
+}
+.breadcrumbs{
+  font-size:12px;
+  color:#6a6a6a;
+  padding:18px 0;
+}
+h1{
+  font-family: Georgia, "Times New Roman", serif;
+  font-size:42px;
+  text-align:center;
+  margin:28px 0 34px;
+  color:#111;
+}
+.hero{
+  background:linear-gradient(90deg,#eef4ff 0%,#f6e0d7 100%);
+  padding:36px 0;
+  margin-bottom:42px;
+}
+.hero p{
+  max-width:700px;
+  font-weight:bold;
+  line-height:1.5;
+}
+.lang{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  margin-bottom:20px;
+}
+.lang button{
+  border:1px solid var(--uam-blue);
+  background:white;
+  color:var(--uam-blue);
+  padding:9px 16px;
+  cursor:pointer;
+  font-weight:bold;
+}
+.lang button.active{
+  background:var(--uam-blue);
+  color:white;
+}
+.search-panel{
+  border-top:6px solid var(--uam-border);
+  background:var(--uam-light);
+  padding:28px;
+  margin-bottom:32px;
+}
+.search-panel h2{
+  margin:0 0 18px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size:28px;
+}
+.filters{
+  display:grid;
+  grid-template-columns:2fr 1fr 1fr;
+  gap:16px;
+}
+label{
+  display:block;
+  font-weight:bold;
+  margin-bottom:7px;
+}
+input,select{
+  width:100%;
+  padding:12px;
+  border:1px solid #b5c3d4;
+  font-size:15px;
+  background:white;
+}
+.count{
+  margin:18px 0;
+  font-weight:bold;
+}
+.card{
+  border-top:5px solid var(--uam-border);
+  background:var(--uam-light);
+  padding:22px;
+  margin-bottom:18px;
+}
+.card h3{
+  margin:0 0 10px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size:24px;
+}
+.meta{
+  color:var(--muted);
+  line-height:1.6;
+  margin-bottom:14px;
+}
+.tag{
+  display:inline-block;
+  border:1px solid #b5c3d4;
+  background:white;
+  padding:5px 10px;
+  margin:4px 5px 4px 0;
+  font-size:14px;
+}
+.links{
+  margin-top:16px;
+}
+.links a{
+  color:var(--uam-blue);
+  font-weight:bold;
+  text-decoration:none;
+  margin-right:18px;
+}
+.links a:hover{text-decoration:underline}
+.footer-links{
+  margin:56px 0 30px;
+}
+.footer-links h2{
+  font-family: Georgia, "Times New Roman", serif;
+  font-size:34px;
+}
+@media(max-width:800px){
+  h1{font-size:32px}
+  .filters{grid-template-columns:1fr}
+  .topbar{height:54px}
+}
+</style>
+</head>
+<body>
+<div class="topbar"></div>
+
+<div class="wrapper">
+  <div class="breadcrumbs">Start &gt; Doktoranci &gt; Szkoły doktorskie &gt; Baza promotorów</div>
+  <h1 id="title">Baza potencjalnych promotorów</h1>
+</div>
+
+<section class="hero">
+  <div class="wrapper">
+    <p id="subtitle">Wyszukaj promotora po nazwisku, dyscyplinie, jednostce lub obszarze badawczym.</p>
+  </div>
+</section>
+
+<main class="wrapper">
+  <div class="lang">
+    <button id="plBtn" class="active" onclick="setLang('pl')">Polski</button>
+    <button id="enBtn" onclick="setLang('en')">English</button>
+  </div>
+
+  <section class="search-panel">
+    <h2 id="panelTitle">Wyszukiwarka</h2>
+    <div class="filters">
+      <div>
+        <label id="searchLabel">Szukaj</label>
+        <input id="search" placeholder="np. fonetyka, arabski, Szekspir">
+      </div>
+      <div>
+        <label id="discLabel">Dyscyplina</label>
+        <select id="discipline">
+          <option value="">Wszystkie</option>
+          <option>Językoznawstwo</option>
+          <option>Literaturoznawstwo</option>
+        </select>
+      </div>
+      <div>
+        <label id="unitLabel">Jednostka</label>
+        <select id="unit">
+          <option value="">Wszystkie</option>
+          <option>Wydział Anglistyki</option>
+          <option>Instytut Filologii Stosowanej</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <div id="count" class="count"></div>
+  <div id="results"></div>
+
+  <section class="footer-links">
+    <h2 id="also">Zobacz także:</h2>
+  </section>
+</main>
+
+<script>
+let lang="pl";
+
+const txt={
+  pl:{
+    title:"Baza potencjalnych promotorów",
+    subtitle:"Wyszukaj promotora po nazwisku, dyscyplinie, jednostce lub obszarze badawczym.",
+    panel:"Wyszukiwarka",
+    search:"Szukaj",
+    disc:"Dyscyplina",
+    unit:"Jednostka",
+    count:"Liczba wyników",
+    profilePL:"Sylwetka PL",
+    profileEN:"Sylwetka EN",
+    also:"Zobacz także:"
+  },
+  en:{
+    title:"Potential supervisors database",
+    subtitle:"Search for a supervisor by name, discipline, unit or research area.",
+    panel:"Search",
+    search:"Search",
+    disc:"Discipline",
+    unit:"Unit",
+    count:"Results",
+    profilePL:"Profile PL",
+    profileEN:"Profile EN",
+    also:"See also:"
+  }
+};
+
+const data=[
+  {
+    name:"Paulina Ambroży",
+    discipline:"Literaturoznawstwo",
+    unit:"Wydział Anglistyki",
+    email:"apaulina@amu.edu.pl",
+    keywords:["ekokrytyka","nature writing","poezja amerykańska","badania intermedialne"],
+    pl:"#",
+    en:""
+  },
+  {
+    name:"Katarzyna Dziubalska-Kołaczyk",
+    discipline:"Językoznawstwo",
+    unit:"Wydział Anglistyki",
+    email:"dkasia@amu.edu.pl",
+    keywords:["fonologia","fonetyka","akwizycja języka","przetwarzanie mowy"],
+    pl:"#",
+    en:"#"
+  },
+  {
+    name:"Marcin Michalski",
+    discipline:"Językoznawstwo",
+    unit:"Instytut Filologii Stosowanej",
+    email:"marcin.michalski@amu.edu.pl",
+    keywords:["język arabski","morfologia języka arabskiego","dialekty arabskie"],
+    pl:"",
+    en:"#"
+  }
+];
+
+function setLang(l){
+  lang=l;
+  document.getElementById("plBtn").classList.toggle("active",l==="pl");
+  document.getElementById("enBtn").classList.toggle("active",l==="en");
+  document.getElementById("title").innerText=txt[l].title;
+  document.getElementById("subtitle").innerText=txt[l].subtitle;
+  document.getElementById("panelTitle").innerText=txt[l].panel;
+  document.getElementById("searchLabel").innerText=txt[l].search;
+  document.getElementById("discLabel").innerText=txt[l].disc;
+  document.getElementById("unitLabel").innerText=txt[l].unit;
+  document.getElementById("also").innerText=txt[l].also;
+  render();
+}
+
+function normalize(x){
+  return String(x||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+}
+
+function render(){
+  const q=normalize(document.getElementById("search").value);
+  const d=document.getElementById("discipline").value;
+  const u=document.getElementById("unit").value;
+
+  const list=data.filter(p=>{
+    const hay=normalize([p.name,p.discipline,p.unit,p.email,...p.keywords].join(" "));
+    return (!q||hay.includes(q)) && (!d||p.discipline===d) && (!u||p.unit===u);
+  });
+
+  document.getElementById("count").innerText=txt[lang].count+": "+list.length;
+
+  document.getElementById("results").innerHTML=list.map(p=>`
+    <article class="card">
+      <h3>${p.name}</h3>
+      <div class="meta"><strong>${p.discipline}</strong><br>${p.unit}</div>
+      <div>${p.keywords.map(k=>`<span class="tag">${k}</span>`).join("")}</div>
+      <div class="links">
+        <a href="mailto:${p.email}">${p.email}</a>
+        ${p.pl?`<a href="${p.pl}" target="_blank">${txt[lang].profilePL}</a>`:""}
+        ${p.en?`<a href="${p.en}" target="_blank">${txt[lang].profileEN}</a>`:""}
+      </div>
+    </article>
+  `).join("");
+}
+
+document.getElementById("search").oninput=render;
+document.getElementById("discipline").onchange=render;
+document.getElementById("unit").onchange=render;
+render();
+</script>
+</body>
+</html>
