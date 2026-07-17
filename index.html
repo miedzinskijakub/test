@@ -212,9 +212,26 @@ input,select{
 const SHEET_URL =
   "https://docs.google.com/spreadsheets/d/1oVB9E0bPJmFyJ1YXhzJH6wyNPV9j6vUhJ6CIjIFxSKE/gviz/tq?tqx=out:csv&sheet=WFPiK";
 
+const SITE_URL =
+  "https://test-dbt5mkz04-kubaaa2000005-7241s-projects.vercel.app";
+
 let lang = "pl";
 let data = [];
 let visibleLimit = 20;
+
+function profileUrl(filename, language) {
+  const file = cleanValue(filename);
+
+  if (!file) return "";
+
+  if (/^https?:\/\//i.test(file)) {
+    return file;
+  }
+
+  const folder = language === "en" ? "en" : "pl";
+
+  return `${SITE_URL}/profiles/${folder}/${encodeURIComponent(file)}`;
+}
 
 const txt = {
   pl: {
@@ -359,8 +376,15 @@ async function loadData() {
           keywordsEN: splitValues(researchEN),
           email: getCell(row, ["Adres e-mail", "email", "Email"]),
           active,
-          profilePL: getCell(row, ["sylwetka_PL", "profile_PL", "profile_pl"]),
-          profileEN: getCell(row, ["sylwetka_EN", "profile_EN", "profile_en"])
+          profilePL: profileUrl(
+  getCell(row, ["sylwetka_PL", "profile_PL", "profile_pl"]),
+  "pl"
+),
+
+profileEN: profileUrl(
+  getCell(row, ["sylwetka_EN", "profile_EN", "profile_en"]),
+  "en"
+)
         };
       })
       .filter(p => {
