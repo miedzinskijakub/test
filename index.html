@@ -216,14 +216,145 @@ body[data-theme="simple"] .links a{
   padding:10px 18px;
   cursor:pointer;
 }
+
+body[data-theme="table"] {
+  --uam-blue: #111;
+  --uam-light: #fff;
+  --uam-border: #ccc;
+  --text: #111;
+  --muted: #555;
+}
+
+body[data-theme="table"] .search-panel {
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 16px;
+}
+
+body[data-theme="table"] .card {
+  background: #fff;
+  border: 0;
+  border-bottom: 1px solid #ccc;
+  padding: 12px 8px;
+  margin: 0;
+}
+
+body[data-theme="table"] .card h3 {
+  font-family: Arial, sans-serif;
+  font-size: 17px;
+  margin-bottom: 6px;
+}
+
+body[data-theme="table"] .tag {
+  padding: 2px 6px;
+  font-size: 12px;
+}
+
+body[data-theme="compact"] {
+  --uam-blue: #333;
+  --uam-light: #f7f7f7;
+  --uam-border: #aaa;
+  --text: #111;
+  --muted: #555;
+}
+
+body[data-theme="compact"] .supervisor-search {
+  max-width: 1300px;
+}
+
+body[data-theme="compact"] .search-panel {
+  padding: 14px;
+  margin: 12px 0;
+  border-top-width: 3px;
+}
+
+body[data-theme="compact"] .card {
+  padding: 12px;
+  margin-bottom: 8px;
+  border-top-width: 2px;
+}
+
+body[data-theme="compact"] .card h3 {
+  font-family: Arial, sans-serif;
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+body[data-theme="compact"] .meta {
+  margin-bottom: 6px;
+}
+
+body[data-theme="compact"] .tag {
+  padding: 3px 6px;
+  font-size: 12px;
+  margin: 2px;
+}
+
+body[data-theme="compact"] .links {
+  margin-top: 7px;
+}
+
+body[data-theme="classic"] {
+  --uam-blue: #222;
+  --uam-light: #fafafa;
+  --uam-border: #777;
+  --text: #222;
+  --muted: #555;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+body[data-theme="classic"] input,
+body[data-theme="classic"] select,
+body[data-theme="classic"] button {
+  font-family: Arial, sans-serif;
+}
+
+body[data-theme="classic"] .search-panel,
+body[data-theme="classic"] .card {
+  background: #fff;
+  border: 1px solid #aaa;
+  border-top: 1px solid #aaa;
+}
+
+body[data-theme="classic"] .card h3 {
+  font-size: 22px;
+}
+
+.theme-switcher {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 15px 20px 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+}
+
+.theme-switcher label {
+  margin: 0;
+  font-size: 14px;
+}
+
+.theme-switcher select {
+  width: auto;
+  min-width: 180px;
+  padding: 8px;
+}
 </style>
 </head>
 
 <body>
-  <div class="theme-switcher">
-  <button onclick="setTheme('uam')">Styl UAM</button>
-  <button onclick="setTheme('simple')">Czarno-biały</button>
-  <button onclick="setTheme('blue')">Niebieski</button>
+<div class="theme-switcher">
+  <label for="themeSelect">Wersja wyglądu:</label>
+
+  <select id="themeSelect" onchange="setTheme(this.value)">
+    <option value="blue">Niebieska</option>
+    <option value="uam">UAM</option>
+    <option value="simple">Czarno-biała</option>
+    <option value="table">Prosta tabela</option>
+    <option value="compact">Kompaktowa</option>
+    <option value="classic">Klasyczna</option>
+  </select>
 </div>
 <div class="supervisor-search">
   <div class="search-header">
@@ -276,15 +407,24 @@ body[data-theme="simple"] .links a{
 
 <script>
 
-  function setTheme(theme) {
+function setTheme(theme) {
   document.body.dataset.theme = theme;
   localStorage.setItem("supervisorTheme", theme);
+
+  const select = document.getElementById("themeSelect");
+
+  if (select) {
+    select.value = theme;
+  }
+
+  render();
 }
-
 const savedTheme =
-  localStorage.getItem("supervisorTheme") || "uam";
+  localStorage.getItem("supervisorTheme") || "blue";
+document.addEventListener("DOMContentLoaded", () => {
+  setTheme(savedTheme);
+});
 
-setTheme(savedTheme);
 const SHEET_URL =
   "https://docs.google.com/spreadsheets/d/1oVB9E0bPJmFyJ1YXhzJH6wyNPV9j6vUhJ6CIjIFxSKE/gviz/tq?tqx=out:csv&sheet=Arkusz2";
 
