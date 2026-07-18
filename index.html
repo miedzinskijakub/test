@@ -194,7 +194,6 @@ input,select{
         <label id="profileLabel">Sylwetka</label>
         <select id="profileFilter">
           <option value="">Wszystkie</option>
-          <option value="hasProfile">Tylko z sylwetką</option>
           <option value="pl">Sylwetka PL</option>
           <option value="en">Sylwetka EN</option>
         </select>
@@ -292,9 +291,8 @@ function setLang(l) {
 
   const profileFilter = document.getElementById("profileFilter");
   profileFilter.options[0].text = txt[l].all;
-  profileFilter.options[1].text = txt[l].onlyProfiles;
-  profileFilter.options[2].text = txt[l].profilePLFilter;
-  profileFilter.options[3].text = txt[l].profileENFilter;
+  profileFilter.options[1].text = txt[l].profilePLFilter;
+  profileFilter.options[2].text = txt[l].profileENFilter;
 
   fillFilters();
   render();
@@ -458,7 +456,6 @@ function render() {
     const hasEN = Boolean(p.profileEN);
 
     let matchesProfile = true;
-    if (profileFilter === "hasProfile") matchesProfile = hasPL || hasEN;
     if (profileFilter === "pl") matchesProfile = hasPL;
     if (profileFilter === "en") matchesProfile = hasEN;
 
