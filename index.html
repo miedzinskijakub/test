@@ -344,18 +344,6 @@ body[data-theme="classic"] .card h3 {
 </head>
 
 <body>
-<div class="theme-switcher">
-  <label for="themeSelect">Wersja wyglądu:</label>
-
-  <select id="themeSelect" onchange="setTheme(this.value)">
-    <option value="blue">Niebieska</option>
-    <option value="uam">UAM</option>
-    <option value="simple">Czarno-biała</option>
-    <option value="table">Prosta tabela</option>
-    <option value="compact">Kompaktowa</option>
-    <option value="classic">Klasyczna</option>
-  </select>
-</div>
 <div class="supervisor-search">
   <div class="search-header">
     <div class="search-title-row">
@@ -407,18 +395,7 @@ body[data-theme="classic"] .card h3 {
 
 <script>
 
-function setTheme(theme) {
-  document.body.dataset.theme = theme;
-  localStorage.setItem("supervisorTheme", theme);
 
-  const select = document.getElementById("themeSelect");
-
-  if (select) {
-    select.value = theme;
-  }
-
-  render();
-}
 const savedTheme =
   localStorage.getItem("supervisorTheme") || "blue";
 document.addEventListener("DOMContentLoaded", () => {
